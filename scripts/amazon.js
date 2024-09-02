@@ -1,3 +1,6 @@
+import {cart,addToCart} from '../data/cart.js';
+import { products } from '../data/products.js';
+
 let productHtml = '';
 products.forEach((product)=>{
   productHtml += `
@@ -54,49 +57,50 @@ products.forEach((product)=>{
 });
 
 document.querySelector('.js-products-grid').innerHTML = productHtml;
+let intervalId;
+function addedMessageFunc(productId, button){
+  const addedMessage = document.querySelector(`.js-added-to-cart-${productId}`);
+  addedMessage.classList.add('added-to-cart-show');
+
+  if (intervalId) {
+    clearTimeout(intervalId); // Clear any existing timeout to avoid multiple timeouts running.
+  }
+
+  intervalId = setTimeout(() => {
+    addedMessage.classList.remove('added-to-cart-show');
+  }, 2000);
+
+  button.addEventListener('click', () => {
+    if (intervalId) {
+      clearTimeout(intervalId); // Clear the timeout if the button is clicked again within the 2 seconds.
+    }
+
+    intervalId = setTimeout(() => {
+      addedMessage.classList.remove('added-to-cart-show');
+    }, 2000);
+  });
+}
+
+function updateItemsQuantity(){
+  let totalquantity = 0;
+cart.forEach((item)=>{
+  totalquantity+=item.quantity;
+})
+return totalquantity;
+}
 
 document.querySelectorAll('.js-add-to-cart-button').forEach((button) => {
 button.addEventListener('click',() => {
 const {productId} = button.dataset;
-let isfound;
+
 const quantitySelector = document.querySelector(
   `.js-quantity-selector-${productId}`
 );
 
-document.querySelector(`.js-added-to-cart-${productId}`).classList.add('added-to-cart-show');
-let intervalId;
-if(intervalId){
-  intervalId = setInterval(()=>{
-  document.querySelector(`.js-added-to-cart-${productId}`).classList.remove('added-to-cart-show');
-},2000);
-}
+addedMessageFunc(productId, button);
+addToCart(productId,quantitySelector);
 
-button.addEventListener('click',() => {
-  if(!intervalId){}
-  clearTimeout(intervalId);
-  intervalId = setInterval(()=>{
-    document.querySelector(`.js-added-to-cart-${productId}`).classList.remove('added-to-cart-show');
-  },2000);
-});
-cart.forEach(item=>{
-  if(productId === item.productId){
-    item.quantity+=Number(quantitySelector.value);
-    isfound = true;
-  }
-});
-if(!isfound){
-  cart.push({
-  productId,
-  quantity: Number(quantitySelector.value)
-});
-console.log(cart);
-
-};
-let totalquantity = 0;
-cart.forEach((item)=>{
-  totalquantity+=item.quantity;
-})
-document.querySelector('.js-cart-quantity').innerHTML = totalquantity;
+document.querySelector('.js-cart-quantity').innerHTML = updateItemsQuantity();
 })
 })
 
