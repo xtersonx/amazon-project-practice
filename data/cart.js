@@ -54,3 +54,12 @@ cart.forEach((cartItem) => {
 });
 return cartQuantity;
 }
+
+export function updateQuantity(productId, newQuantity) {
+  const matchingItem = cart.find(cartItem => productId === cartItem.productId);
+
+  if (matchingItem) {
+    matchingItem.quantity = newQuantity;
+    saveToStorage();
+  }
+}
