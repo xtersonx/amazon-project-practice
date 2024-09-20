@@ -2,8 +2,9 @@ import { cart, removeFromCart, calculateCartQuantity, updateQuantity, updateDeli
 import { products, getProduct } from "../../data/products.js";
 import { formatCurrency } from "../utils/money.js";
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
-import { deliveryOptions, getDeliveryOption } from "../../data/deliveryOption.js";
+import { deliveryOptions, getDeliveryOption, calculateDeliveryDate } from "../../data/deliveryOption.js";
 import { renderPaymentSummary } from "./paymentSummary.js";
+import {renderCheckoutHeader} from "./checkoutHeader.js";
 
 export function renderOrderSummary() {
 
@@ -18,14 +19,11 @@ export function renderOrderSummary() {
 
     let deliveryOption = getDeliveryOption(deliveryOptionId);
 
-
-    const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryTime, 'days');
-    const dateString = deliveryDate.format('dddd, MMMM D');
+    const dateString = calculateDeliveryDate(deliveryOption);
 
     cartHtml+=`<div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
           <div class="delivery-date">
-            Delivery date: ${dateString};
+            Delivery date: ${dateString}
           </div>
 
           <div class="cart-item-details-grid">
@@ -66,12 +64,6 @@ export function renderOrderSummary() {
         </div>`
 })
 
-function updateCartQuantity(){
-  const cartQuantity = calculateCartQuantity();
-
-  document.querySelector('.js-return-to-home-link')
-    .innerHTML = `${cartQuantity} items`;
-}
 
 function isDecimal(num) {
   return num % 1 !== 0;
@@ -84,16 +76,13 @@ document.querySelectorAll('.js-delete-quantity-link').forEach((link)=>{
   link.addEventListener('click',()=>{
     const itemId = link.dataset.itemId;
     removeFromCart(itemId);
-    document.querySelector(`.js-cart-item-container-${itemId}`).remove();
-    updateCartQuantity();
+    renderOrderSummary();
     renderPaymentSummary();
   })
   
 })
 
-updateCartQuantity();
-
-
+renderCheckoutHeader();
 
 document.querySelectorAll('.js-update-link')
   .forEach((link) => {
@@ -117,12 +106,12 @@ document.querySelectorAll('.js-update-link')
       }
   
       updateQuantity(productId, newQuantity);
-      updateCartQuantity();
       document.querySelector(`.js-quantity-label-${productId}`).innerHTML = newQuantity;
   
       const container = document.querySelector(`.js-cart-item-container-${productId}`);
       container.classList.remove('is-editing-quantity');
       renderPaymentSummary();
+      renderCheckoutHeader();
     };
   
     // Handle click on the save link
@@ -137,12 +126,16 @@ document.querySelectorAll('.js-update-link')
     });
   });
   
+  function isWeekend(date) {
+    const dayOfWeek = date.format('dddd');
+    return dayOfWeek === 'Saturday' || dayOfWeek === 'Sunday';
+  }
+
 function deliveryOptionHtml(productId, cartItem) {
   let html = ``;
   deliveryOptions.forEach((deliveryOption)=>{
-    const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryTime, 'days');
-    const dateString = deliveryDate.format('dddd, MMMM D');
+    const dateString = calculateDeliveryDate(deliveryOption);
+    console.log(dateString);
     const priceString = deliveryOption.priceCents === 0 ? 'FREE' : `${formatCurrency(deliveryOption.priceCents)} -`;
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
@@ -166,7 +159,8 @@ function deliveryOptionHtml(productId, cartItem) {
         </div>
       </div>
   `;
-  })
+  }
+);
   return html;
 };
 
