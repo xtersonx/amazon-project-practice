@@ -21,7 +21,9 @@ export function renderOrderSummary() {
 
     const dateString = calculateDeliveryDate(deliveryOption);
 
-    cartHtml+=`<div class="cart-item-container js-cart-item-container-${matchingProduct.id}">
+    cartHtml+=`<div class="cart-item-container 
+          js-cart-item-container
+          js-cart-item-container-${matchingProduct.id}">
           <div class="delivery-date">
             Delivery date: ${dateString}
           </div>
@@ -31,15 +33,15 @@ export function renderOrderSummary() {
               src="${matchingProduct.image}">
 
             <div class="cart-item-details">
-              <div class="product-name">
+              <div class="product-name js-product-name-${matchingProduct.id}">
                 ${matchingProduct.name}
               </div>
-              <div class="product-price">
+              <div class="product-price js-product-price-${matchingProduct.id}">
                 $${formatCurrency(matchingProduct.priceCents)}
               </div>
               <div class="product-quantity">
                 <span>
-                  Quantity: <span class="quantity-label js-quantity-label-${matchingProduct.id}">${item.quantity}</span>
+                  Quantity: <span class="quantity-label js-quantity-label js-quantity-label-${matchingProduct.id}">${item.quantity}</span>
                 </span>
                 <span class="update-quantity-link link-primary js-update-link" data-product-id="${matchingProduct.id}">
                   Update
@@ -48,7 +50,9 @@ export function renderOrderSummary() {
                 <span class="save-quantity-link link-primary js-save-link" data-product-id="${matchingProduct.id}">
                 Save
                   </span>
-                <span class="delete-quantity-link link-primary js-delete-quantity-link" data-item-id="${productId}">
+                <span class="delete-quantity-link link-primary js-delete-quantity-link
+                  js-delete-link-${matchingProduct.id}"
+                  data-item-id="${productId}">
                   Delete
                 </span>
               </div>
@@ -140,13 +144,15 @@ function deliveryOptionHtml(productId, cartItem) {
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
      html += `
-      <div class="delivery-option js-delivery-option" 
+      <div class="delivery-option js-delivery-option
+        js-delivery-option-${productId}-${deliveryOption.id}
+      " 
        data-product-id="${productId}"
        data-delivery-option-id="${deliveryOption.id}"
        >
         <input type="radio"
           ${isChecked ? 'checked' : ''}
-          class="delivery-option-input "
+          class="delivery-option-input js-delivery-option-input-${productId}-${deliveryOption.id}"
           name="delivery-option-${productId}"
           >
         <div>
