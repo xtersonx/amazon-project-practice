@@ -139,7 +139,6 @@ function deliveryOptionHtml(productId, cartItem) {
   let html = ``;
   deliveryOptions.forEach((deliveryOption)=>{
     const dateString = calculateDeliveryDate(deliveryOption);
-    console.log(dateString);
     const priceString = deliveryOption.priceCents === 0 ? 'FREE' : `${formatCurrency(deliveryOption.priceCents)} -`;
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
