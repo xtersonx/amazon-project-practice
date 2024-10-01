@@ -173,7 +173,6 @@ function deliveryOptionHtml(productId, cartItem) {
     element.addEventListener('click',()=>{
       const {productId, deliveryOptionId} = element.dataset;
       updateDeliveryOption(productId, deliveryOptionId);
-     console.log(cart);
      renderOrderSummary();
      renderPaymentSummary();
     })
